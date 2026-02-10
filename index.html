@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bukhariya Assets - Final PDF Fix</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Manjari:wght@400;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #003366;
+            --secondary: #0066cc;
+            --accent: #f4f9ff;
+            --danger: #d9534f;
+            --success: #28a745;
+            --text: #333;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #eef2f7;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .search-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 550px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ced4da;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+        }
+
+        .btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: white;
+        }
+
+        .btn-go { background: var(--secondary); }
+        .btn-new { background: var(--danger); }
+        .btn-pdf { 
+            background: var(--success); 
+            width: 100%; 
+            max-width: 550px; 
+            margin-bottom: 20px;
+            display: none; 
+        }
+
+        /* Hidden Template for PDF */
+        #a4-template {
+            width: 210mm;
+            background: white;
+            display: none;
+            box-sizing: border-box;
+            position: absolute;
+            left: -9999px;
+        }
+
+        .pdf-box {
+            padding: 30px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .pdf-header {
+            text-align: center;
+            border-bottom: 4px solid var(--primary);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .pdf-header h1 { margin: 0; color: var(--primary); font-size: 28px; }
+        .pdf-header p { margin: 5px 0 0; color: #555; font-weight: 700; font-size: 16px; text-transform: uppercase; }
+
+        .id-bar {
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .item-box {
+            background: var(--accent);
+            padding: 8px 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            border: 1px solid #d1e3f8;
+            border-left: 5px solid var(--secondary);
+        }
+
+        .icon-circle {
+            width: 30px;
+            height: 30px;
+            background: white;
+            color: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .label-text { font-size: 9px; color: #666; font-weight: 800; text-transform: uppercase; }
+        .val-text { font-size: 13px; color: var(--text); font-weight: 700; }
+
+        .rem-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fffafa;
+            border: 2px dashed #ffc1c1;
+            border-radius: 10px;
+        }
+
+        .rem-label { color: #b22222; font-weight: 800; font-size: 14px; margin-bottom: 5px; display: block; }
+        .rem-msg { font-family: 'Manjari', sans-serif; font-size: 16px; color: #444; line-height: 1.4; }
+
+        .pdf-footer {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #999;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="search-card">
+        <h2 style="text-align: center; color: var(--primary); margin: 0 0 15px 0;">BUKHARIYA ASSET REGISTER</h2>
+        <input type="text" id="assetID" placeholder="Enter Asset ID...">
+        <div class="btns">
+            <button class="btn-go" onclick="findAsset()">Search</button>
+            <button class="btn-new" onclick="clearAll()">New Search</button>
+        </div>
+    </div>
+
+    <button id="pdfBtn" class="btn-pdf" onclick="downloadPDF()">
+        <i class="fas fa-file-pdf"></i> Download One-Page PDF
+    </button>
+
+    <div id="a4-template">
+        <div class="pdf-box">
+            <div class="pdf-header">
+                <h1>BUKHARIYA EDUCATIONAL CENTRE</h1>
+                <p>INSTITUTION ASSET REGISTER REPORT</p>
+            </div>
+            <div class="id-bar">
+                <span id="out-ID" style="font-weight: 800; font-size: 18px;"></span>
+                <span id="out-Stat" style="background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 10px;"></span>
+            </div>
+            <div class="data-grid" id="out-Grid"></div>
+            <div class="rem-box">
+                <span class="rem-label">REMARKS</span>
+                <div class="rem-msg" id="out-Rem"></div>
+            </div>
+            <div class="pdf-footer">
+                <span>Official Asset Record</span>
+                <span id="out-Time"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sheetLink = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQHQAEtX0eMrBK5qnGcdthpIWdIKlM4pcy0En0DhXhX1MRSBAML6t2c9r1V_7hQRAQHMVOMRRmTrDQc/pub?gid=459295878&single=true&output=tsv';
+
+        async function findAsset() {
+            const query = document.getElementById('assetID').value.trim().toUpperCase();
+            if (!query) return;
+            try {
+                const res = await fetch(sheetLink);
+                const raw = await res.text();
+                const lines = raw.split('\n').map(l => l.split('\t'));
+                const hdrs = lines[0].map(h => h.trim());
+                const match = lines.find(l => l[1] && l[1].trim().toUpperCase() === query);
+                if (match) showData(hdrs, match);
+                else alert("Asset ID not found!");
+            } catch (e) { alert("Error!"); }
+        }
+
+        function showData(hdrs, row) {
+            const grid = document.getElementById('out-Grid');
+            grid.innerHTML = '';
+            const icons = { "Sl No": "hashtag", "Asset Name": "box", "Category": "tags" };
+            row.forEach((v, i) => {
+                const label = hdrs[i];
+                if (!label || ["Asset ID", "Status", "Remarks"].includes(label)) return;
+                const item = document.createElement('div');
+                item.className = 'item-box';
+                item.innerHTML = `<div class="icon-circle"><i class="fas fa-${icons[label]||'circle'}"></i></div>
+                    <div><div class="label-text">${label}</div><div class="val-text">${v||'---'}</div></div>`;
+                grid.appendChild(item);
+            });
+            document.getElementById('out-ID').innerText = "ASSET ID: " + row[1];
+            document.getElementById('out-Stat').innerText = row[20] || "In Use";
+            document.getElementById('out-Rem').innerText = row[21] || "---";
+            document.getElementById('out-Time').innerText = new Date().toLocaleString();
+            document.getElementById('a4-template').style.display = 'block';
+            document.getElementById('pdfBtn').style.display = 'block';
+        }
+
+        function clearAll() {
+            document.getElementById('assetID').value = '';
+            document.getElementById('pdfBtn').style.display = 'none';
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('a4-template');
+            const opt = {
+                margin: 0,
+                filename: 'Asset_Report.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: 'avoid-all' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+</body>
+</html>
